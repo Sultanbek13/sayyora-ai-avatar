@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sayyora — Your Star-Spirit Guide to the Silk Road</title>
+<style>
+  :root{
+    --bg:#0c0a24; --panel:#15123a; --panel2:#1d1950; --ink:#f3efff; --muted:#a9a3d6;
+    --accent:#ffcf5c; --accent2:#4fe0d6; --pink:#ff7ac6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--ink);overflow:hidden}
+  .app{display:grid;grid-template-columns:1.25fr 1fr;height:100vh}
+  @media (max-width:860px){.app{grid-template-columns:1fr;grid-template-rows:56vh 44vh}}
+
+  /* ---------- STAGE ---------- */
+  .stage{position:relative;overflow:hidden;cursor:default}
+  #scene{position:absolute;inset:0;width:100%;height:100%}
+  .scene-layer{transition:opacity 1.6s ease}
+  .caravan{animation:caravan 70s linear infinite}
+  @keyframes caravan{from{transform:translateX(-260px)}to{transform:translateX(1000px)}}
+  .twinkle{animation:tw 3s ease-in-out infinite}
+  @keyframes tw{0%,100%{opacity:.25}50%{opacity:1}}
+  .window-lit{animation:tw 5s ease-in-out infinite}
+
+  #avatarWrap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:92%;aspect-ratio:400/520}
+  #avatar{width:100%;height:100%;overflow:visible}
+  .aura{transition:opacity .4s}
+  .freckle{animation:tw 2.4s ease-in-out infinite}
+
+  .topbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;z-index:5;pointer-events:none}
+  .brand{pointer-events:auto}
+  .brand h1{font-size:22px;letter-spacing:.5px;font-weight:700}
+  .brand h1 span{color:var(--accent)}
+  .brand p{font-size:12px;color:var(--muted)}
+  .status{pointer-events:auto;display:flex;align-items:center;gap:8px;background:rgba(10,8,30,.55);backdrop-filter:blur(6px);padding:6px 12px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.08)}
+  .dot{width:9px;height:9px;border-radius:50%;background:#6cf59a;box-shadow:0 0 8px #6cf59a}
+  .status.speaking .dot{background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse .5s infinite alternate}
+  .status.listening .dot{background:#ff5d7a;box-shadow:0 0 10px #ff5d7a;animation:pulse .4s infinite alternate}
+  .status.thinking .dot{background:var(--accent2);box-shadow:0 0 10px var(--accent2);animation:pulse .7s infinite alternate}
+  @keyframes pulse{to{transform:scale(1.5)}}
+
+  .caption{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(92%,640px);text-align:center;z-index:6;
+    background:rgba(8,6,26,.66);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px 16px;
+    font-size:15px;line-height:1.45;opacity:0;transition:opacity .35s;pointer-events:none;max-height:30%;overflow:hidden}
+  .caption.show{opacity:1}
+  .caption .w{transition:color .1s}
+  .caption .w.on{color:var(--accent);text-shadow:0 0 10px rgba(255,207,92,.6)}
+  .caption .w.done{color:#fff}
+  .caption .w.todo{color:rgba(255,255,255,.45)}
+
+  .thought{position:absolute;top:16%;right:14%;z-index:6;background:#fff;color:#2a2060;border-radius:20px;padding:8px 16px;font-weight:700;font-size:20px;opacity:0;transform:scale(.6);transition:all .3s}
+  .thought.show{opacity:1;transform:scale(1)}
+  .thought::after{content:"";position:absolute;left:-14px;bottom:-12px;width:14px;height:14px;background:#fff;border-radius:50%}
+  .thought span{display:inline-block;animation:bounce 1s infinite}
+  .thought span:nth-child(2){animation-delay:.15s}.thought span:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{50%{transform:translateY(-5px)}}
+
+  .particle{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;opacity:0;pointer-events:none;animation:floatUp linear infinite}
+  @keyframes floatUp{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh);opacity:0}}
+  .heart{position:absolute;color:var(--pink);font-size:26px;pointer-events:none;z-index:7;animation:heartUp 2.2s ease-out forwards}
+  @keyframes heartUp{0%{transform:translateY(0) scale(.4);opacity:0}20%{opacity:1}100%{transform:translateY(-220px) scale(1.2);opacity:0}}
+
+  .scene-tag{position:absolute;left:18px;top:74px;z-index:5;font-size:12px;color:var(--muted);background:rgba(10,8,30,.5);padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08)}
+
+  /* ---------- CHAT ---------- */
+  .chat{display:flex;flex-direction:column;background:linear-gradient(180deg,var(--panel),#100d2c);border-left:1px solid rgba(255,255,255,.06);min-height:0}
+  .chat-head{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center}
+  .chat-head h2{font-size:15px}
+  .chat-head small{color:var(--muted);font-size:12px}
+  .iconbtn{background:var(--panel2);border:1px solid rgba(255,255,255,.1);color:var(--ink);border-radius:10px;padding:7px 10px;cursor:pointer;font-size:13px}
+  .iconbtn:hover{border-color:var(--accent)}
+  .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:0}
+  .msg{max-width:86%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.45;white-space:pre-wrap;animation:pop .25s ease}
+  @keyframes pop{from{transform:translateY(6px);opacity:0}}
+  .msg.bot{background:var(--panel2);border:1px solid rgba(255,255,255,.07);border-bottom-left-radius:4px;align-self:flex-start}
+  .msg.user{background:linear-gradient(135deg,#7b5cff,#c35cff);border-bottom-right-radius:4px;align-self:flex-end}
+  .msg .who{font-size:11px;color:var(--accent);font-weight:700;display:block;margin-bottom:3px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+  .chip{background:transparent;border:1px solid rgba(79,224,214,.5);color:var(--accent2);padding:6px 11px;border-radius:999px;font-size:12.5px;cursor:pointer;transition:all .2s}
+  .chip:hover{background:rgba(79,224,214,.12)}
+  .composer{display:flex;gap:8px;padding:12px 14px;border-top:1px solid rgba(255,255,255,.06)}
+  .composer input{flex:1;background:#0e0b2a;border:1px solid rgba(255,255,255,.12);color:var(--ink);border-radius:12px;padding:12px 14px;font-size:14.5px;outline:none}
+  .composer input:focus{border-color:var(--accent)}
+  .btn{border:none;border-radius:12px;padding:0 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .send{background:var(--accent);color:#2a1d00}
+  .mic{background:var(--panel2);color:var(--ink);border:1px solid rgba(255,255,255,.12);width:48px;padding:0;font-size:20px}
+  .mic.on{background:#ff5d7a;border-color:#ff5d7a;animation:pulse2 1s infinite}
+  @keyframes pulse2{50%{box-shadow:0 0 0 8px rgba(255,93,122,.2)}}
+
+  /* ---------- OVERLAY / SETTINGS ---------- */
+  .overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(60,40,140,.75),rgba(5,4,18,.95))}
+  .wake{text-align:center;max-width:520px;padding:24px}
+  .wake h2{font-size:34px;margin-bottom:6px}
+  .wake h2 span{color:var(--accent)}
+  .wake p{color:var(--muted);margin-bottom:22px;line-height:1.5}
+  .wake button{background:linear-gradient(135deg,var(--accent),#ff9f5c);color:#2a1300;font-size:18px;font-weight:800;border:none;border-radius:999px;padding:16px 34px;cursor:pointer;box-shadow:0 0 30px rgba(255,207,92,.5);animation:pulse3 2s infinite}
+  @keyframes pulse3{50%{box-shadow:0 0 50px rgba(255,207,92,.8)}}
+  .modal{background:var(--panel);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:22px;width:min(92vw,440px);max-height:90vh;overflow:auto}
+  .modal h3{margin-bottom:14px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px}
+  .field input,.field select{width:100%;background:#0e0b2a;border:1px solid rgba(255,255,255,.14);color:var(--ink);border-radius:10px;padding:9px 10px;font-size:14px}
+  .field input[type=range]{padding:0}
+  .note{font-size:12px;color:var(--muted);line-height:1.45}
+  .hidden{display:none!important}
+  .moodbar{position:absolute;right:14px;top:170px;z-index:5;display:flex;flex-direction:column;gap:6px}
+  .moodbar button{background:rgba(10,8,30,.55);border:1px solid rgba(255,255,255,.1);color:var(--ink);border-radius:10px;padding:5px 8px;font-size:11.5px;cursor:pointer;backdrop-filter:blur(6px)}
+  .moodbar button:hover{border-color:var(--accent)}
+  @media (max-width:860px){.moodbar{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- =================== STAGE =================== -->
+  <section class="stage" id="stage">
+    <svg id="scene" viewBox="0 0 800 600" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="skyDesert" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#07061f"/><stop offset=".6" stop-color="#2d1760"/><stop offset="1" stop-color="#b6507c"/></linearGradient>
+        <linearGradient id="skySam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14215a"/><stop offset=".55" stop-color="#7b3f8c"/><stop offset="1" stop-color="#ff9f63"/></linearGradient>
+        <linearGradient id="skyBuk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241640"/><stop offset=".55" stop-color="#a5507a"/><stop offset="1" stop-color="#ffd27a"/></linearGradient>
+        <linearGradient id="skyKhi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3478"/><stop offset=".6" stop-color="#c47aa6"/><stop offset="1" stop-color="#ffc1a8"/></linearGradient>
+        <linearGradient id="skyTash" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#06142e"/><stop offset=".6" stop-color="#123c66"/><stop offset="1" stop-color="#3a9fc2"/></linearGradient>
+        <radialGradient id="moonG"><stop offset="0" stop-color="#fffbe6"/><stop offset="1" stop-color="#ffe08a"/></radialGradient>
+        <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ff0e0"/><stop offset="1" stop-color="#1689a3"/></linearGradient>
+        <g id="camel"><path d="M0,20 C0,5 10,0 16,8 C22,0 32,2 34,14 L44,14 L52,2 L58,0 L61,4 L55,6 L50,20 L48,24 L46,40 L43,40 L42,26 L36,26 L35,40 L32,40 L31,26 L14,26 L12,40 L9,40 L8,26 L4,26 L2,40 L-1,40 Z"/></g>
+      </defs>
+
+      <!-- DESERT NIGHT -->
+      <g class="scene-layer" data-scene="desert">
+        <rect width="800" height="600" fill="url(#skyDesert)"/>
+        <circle cx="640" cy="110" r="42" fill="url(#moonG)"/><circle cx="660" cy="98" r="40" fill="#1a1046" opacity=".9"/>
+        <path d="M0,470 C150,420 260,440 400,470 C540,500 650,430 800,450 L800,600 L0,600Z" fill="#3a1d4f"/>
+        <g class="caravan" fill="#1a0d2e"><use href="#camel" x="0" y="440"/><use href="#camel" x="80" y="444"/><use href="#camel" x="160" y="440"/><circle cx="185" cy="436" r="5"/></g>
+        <path d="M0,520 C120,490 300,500 430,530 C560,560 700,500 800,510 L800,600 L0,600Z" fill="#24113a"/>
+      </g>
+
+      <!-- SAMARKAND (Registan) -->
+      <g class="scene-layer" data-scene="samarkand" opacity="0">
+        <rect width="800" height="600" fill="url(#skySam)"/>
+        <circle cx="400" cy="420" r="70" fill="#ffd27a" opacity=".55"/>
+        <g fill="#1b1640">
+          <!-- left madrasa -->
+          <rect x="60" y="330" width="200" height="190"/><rect x="110" y="270" width="100" height="250"/>
+          <rect x="70" y="250" width="16" height="270"/><ellipse cx="78" cy="250" rx="14" ry="10" fill="url(#tile)"/>
+          <rect x="235" y="250" width="16" height="270"/><ellipse cx="243" cy="250" rx="14" ry="10" fill="url(#tile)"/>
+          <ellipse cx="90" cy="330" rx="24" ry="30" fill="url(#tile)"/><ellipse cx="230" cy="330" rx="24" ry="30" fill="url(#tile)"/>
+          <!-- center -->
+          <rect x="300" y="340" width="200" height="180"/><rect x="345" y="290" width="110" height="230"/>
+          <ellipse cx="400" cy="300" rx="48" ry="52" fill="url(#tile)"/>
+          <!-- right madrasa -->
+          <rect x="540" y="330" width="200" height="190"/><rect x="590" y="270" width="100" height="250"/>
+          <rect x="550" y="250" width="16" height="270"/><ellipse cx="558" cy="250" rx="14" ry="10" fill="url(#tile)"/>
+          <rect x="715" y="250" width="16" height="270"/><ellipse cx="723" cy="250" rx="14" ry="10" fill="url(#tile)"/>
+          <ellipse cx="570" cy="330" rx="24" ry="30" fill="url(#tile)"/><ellipse cx="710" cy="330" rx="24" ry="30" fill="url(#tile)"/>
+        </g>
+        <g fill="#3a2f7a"><path d="M130,520 V330 Q160,290 190,330 V520Z"/><path d="M365,520 V370 Q400,320 435,370 V520Z"/><path d="M610,520 V330 Q640,290 670,330 V520Z"/></g>
+        <rect y="520" width="800" height="80" fill="#130f30"/>
+      </g>
+
+      <!-- BUKHARA (Kalyan) -->
+      <g class="scene-layer" data-scene="bukhara" opacity="0">
+        <rect width="800" height="600" fill="url(#skyBuk)"/>
+        <g fill="#2a173d">
+          <path d="M555,520 L563,170 L607,170 L615,520Z"/>
+          <rect x="552" y="140" width="66" height="34" rx="4"/><path d="M560,140 Q585,108 610,140Z"/>
+          <rect x="120" y="380" width="300" height="140"/><ellipse cx="270" cy="380" rx="80" ry="70" fill="url(#tile)"/>
+          <rect x="100" y="420" width="40" height="100"/><rect x="400" y="420" width="40" height="100"/>
+          <rect x="650" y="430" width="150" height="90"/><rect x="0" y="450" width="120" height="70"/>
+        </g>
+        <g fill="#c98e56" opacity=".35"><rect x="563" y="200" width="44" height="4"/><rect x="562" y="240" width="46" height="4"/><rect x="561" y="290" width="48" height="4"/><rect x="560" y="340" width="50" height="4"/></g>
+        <rect y="520" width="800" height="80" fill="#1d1029"/>
+      </g>
+
+      <!-- KHIVA (walls + Kalta Minor) -->
+      <g class="scene-layer" data-scene="khiva" opacity="0">
+        <rect width="800" height="600" fill="url(#skyKhi)"/>
+        <path d="M640,520 L648,160 L672,160 L680,520Z" fill="#3b2a55"/><rect x="644" y="140" width="32" height="22" fill="#3b2a55"/>
+        <rect x="250" y="300" width="130" height="220" rx="10" fill="url(#tile)"/>
+        <g fill="#1689a3" opacity=".6"><rect x="250" y="340" width="130" height="10"/><rect x="250" y="390" width="130" height="10"/><rect x="250" y="440" width="130" height="10"/></g>
+        <path d="M0,430 h40 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h30 a12,12 0 0 1 24,0 h40 V600 H0Z" fill="#7a4c5c"/>
+        <rect y="520" width="800" height="80" fill="#4a2b3d"/>
+      </g>
+
+      <!-- TASHKENT (TV tower + city) -->
+      <g class="scene-layer" data-scene="tashkent" opacity="0">
+        <rect width="800" height="600" fill="url(#skyTash)"/>
+        <g fill="#0a1a33">
+          <path d="M600,520 L612,120 L618,120 L630,520Z"/><ellipse cx="615" cy="220" rx="26" ry="14"/><ellipse cx="615" cy="300" rx="18" ry="9"/><rect x="613" y="60" width="4" height="62"/>
+          <rect x="20" y="380" width="70" height="140"/><rect x="100" y="340" width="60" height="180"/><rect x="170" y="400" width="90" height="120"/>
+          <rect x="430" y="370" width="70" height="150"/><rect x="510" y="410" width="60" height="110"/><rect x="660" y="360" width="60" height="160"/><rect x="730" y="400" width="70" height="120"/>
+          <ellipse cx="340" cy="430" rx="50" ry="44" fill="#123a5a"/><rect x="280" y="430" width="120" height="90"/>
+        </g>
+        <g fill="#ffd27a" class="window-lit"><rect x="35" y="400" width="8" height="8"/><rect x="60" y="430" width="8" height="8"/><rect x="115" y="360" width="8" height="8"/><rect x="140" y="400" width="8" height="8"/><rect x="450" y="390" width="8" height="8"/><rect x="475" y="440" width="8" height="8"/><rect x="680" y="380" width="8" height="8"/><rect x="750" y="430" width="8" height="8"/><circle cx="615" cy="220" r="3" fill="#ff5d7a"/></g>
+        <rect y="520" width="800" height="80" fill="#061226"/>
+      </g>
+
+      <g id="starsLayer"></g>
+    </svg>
+
+    <div class="topbar">
+      <div class="brand"><h1>Sayyora <span>✦</span></h1><p>Star-spirit guide of the Silk Road</p></div>
+      <div class="status" id="status"><div class="dot"></div><span id="statusText">Sleeping</span></div>
+    </div>
+    <div class="scene-tag" id="sceneTag">Desert night · Kyzylkum</div>
+    <div class="moodbar" id="moodbar"></div>
+    <div class="thought" id="thought"><span>.</span><span>.</span><span>.</span></div>
+
+    <div id="avatarWrap">
+    <svg id="avatar" viewBox="0 0 400 520">
+      <defs>
+        <radialGradient id="skin" cx=".5" cy=".42" r=".62"><stop offset="0" stop-color="#c9d0ff"/><stop offset=".7" stop-color="#9aa3f6"/><stop offset="1" stop-color="#7a82e6"/></radialGradient>
+        <linearGradient id="nebula" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ff7ac6"><animate attributeName="stop-color" values="#ff7ac6;#b07aff;#4fe0d6;#ff7ac6" dur="12s" repeatCount="indefinite"/></stop>
+          <stop offset=".5" stop-color="#7a4cff"><animate attributeName="stop-color" values="#7a4cff;#ff5cae;#7a4cff" dur="9s" repeatCount="indefinite"/></stop>
+          <stop offset="1" stop-color="#2fc6d6"><animate attributeName="stop-color" values="#2fc6d6;#7a4cff;#ffb35c;#2fc6d6" dur="14s" repeatCount="indefinite"/></stop>
+        </linearGradient>
+        <radialGradient id="iris" cx=".45" cy=".4" r=".6"><stop offset="0" stop-color="#fff2b0"/><stop offset=".45" stop-color="#ffc94a"/><stop offset="1" stop-color="#e0741c"/></radialGradient>
+        <radialGradient id="auraG"><stop offset="0" stop-color="#b9a4ff" stop-opacity=".55"/><stop offset="1" stop-color="#b9a4ff" stop-opacity="0"/></radialGradient>
+        <pattern id="ikat" width="36" height="36" patternUnits="userSpaceOnUse">
+          <rect width="36" height="36" fill="#7a1f63"/>
+          <path d="M18,0 L30,18 L18,36 L6,18Z" fill="#ffcf5c"/>
+          <path d="M18,7 L25,18 L18,29 L11,18Z" fill="#2fb8c6"/>
+          <path d="M18,13 L21,18 L18,23 L15,18Z" fill="#fff"/>
+          <rect x="0" y="0" width="3" height="36" fill="#3a0f40"/>
+        </pattern>
+        <clipPath id="eyeClipL"><ellipse cx="155" cy="262" rx="23" ry="26"/></clipPath>
+        <clipPath id="eyeClipR"><ellipse cx="245" cy="262" rx="23" ry="26"/></clipPath>
+        <clipPath id="mouthClip"><path id="mouthClipPath" d=""/></clipPath>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <circle class="aura" id="aura" cx="200" cy="270" r="210" fill="url(#auraG)"/>
+      <circle id="listenRing" cx="200" cy="270" r="190" fill="none" stroke="#ff5d7a" stroke-width="3" opacity="0"/>
+
+      <g id="body">
+        <rect x="174" y="370" width="52" height="70" fill="#7f87ea"/>
+        <path d="M40,520 C48,452 110,420 200,416 C290,420 352,452 360,520Z" fill="url(#ikat)"/>
+        <path d="M168,418 L200,470 L232,418 Z" fill="#f4ecff"/>
+        <path d="M150,420 L200,500 L250,420" fill="none" stroke="#ffcf5c" stroke-width="5"/>
+        <!-- little star brooch -->
+        <path d="M200,478 l4,9 9,1 -7,6 2,9 -8,-5 -8,5 2,-9 -7,-6 9,-1z" fill="#ffcf5c" filter="url(#glow)"/>
+      </g>
+
+      <g id="head">
+        <!-- hair back -->
+        <path id="hairBack" d="M78,255 C58,140 128,78 200,78 C282,78 348,140 322,262 C336,340 352,412 330,452 C298,432 312,352 300,300 L100,300 C90,352 104,432 70,452 C48,412 64,340 78,255Z" fill="url(#nebula)"/>
+        <g fill="#fff" opacity=".8"><circle class="freckle" cx="96" cy="380" r="1.8"/><circle class="freckle" cx="318" cy="400" r="2" style="animation-delay:1s"/><circle class="freckle" cx="86" cy="320" r="1.5" style="animation-delay:.5s"/><circle class="freckle" cx="326" cy="330" r="1.6" style="animation-delay:1.6s"/></g>
+
+        <!-- ears + moon earrings -->
+        <ellipse cx="86" cy="270" rx="14" ry="22" fill="#8c94ee"/>
+        <ellipse cx="314" cy="270" rx="14" ry="22" fill="#8c94ee"/>
+        <g id="earL"><line x1="86" y1="290" x2="86" y2="302" stroke="#ffcf5c" stroke-width="2"/><path d="M78,304 a10,10 0 1 0 16,0 a8,8 0 1 1 -16,0z" fill="#ffcf5c" filter="url(#glow)"/></g>
+        <g id="earR"><line x1="314" y1="290" x2="314" y2="302" stroke="#ffcf5c" stroke-width="2"/><path d="M306,304 a10,10 0 1 0 16,0 a8,8 0 1 1 -16,0z" fill="#ffcf5c" filter="url(#glow)"/></g>
+
+        <!-- face -->
+        <path d="M200,128 C292,128 318,196 316,264 C314,334 270,394 200,397 C130,394 86,334 84,264 C82,196 108,128 200,128Z" fill="url(#skin)"/>
+
+        <!-- blush -->
+        <ellipse id="blushL" cx="138" cy="318" rx="22" ry="11" fill="#ff7ab0" opacity=".25"/>
+        <ellipse id="blushR" cx="262" cy="318" rx="22" ry="11" fill="#ff7ab0" opacity=".25"/>
+        <!-- star freckles -->
+        <g fill="#fff">
+          <path class="freckle" d="M128,302 l1.5,3.5 3.5,1.5 -3.5,1.5 -1.5,3.5 -1.5,-3.5 -3.5,-1.5 3.5,-1.5z"/>
+          <path class="freckle" style="animation-delay:.8s" d="M146,312 l1.2,2.8 2.8,1.2 -2.8,1.2 -1.2,2.8 -1.2,-2.8 -2.8,-1.2 2.8,-1.2z"/>
+          <path class="freckle" style="animation-delay:1.4s" d="M134,322 l1,2.4 2.4,1 -2.4,1 -1,2.4 -1,-2.4 -2.4,-1 2.4,-1z"/>
+          <path class="freckle" style="animation-delay:.4s" d="M272,302 l1.5,3.5 3.5,1.5 -3.5,1.5 -1.5,3.5 -1.5,-3.5 -3.5,-1.5 3.5,-1.5z"/>
+          <path class="freckle" style="animation-delay:1.1s" d="M254,312 l1.2,2.8 2.8,1.2 -2.8,1.2 -1.2,2.8 -1.2,-2.8 -2.8,-1.2 2.8,-1.2z"/>
+          <path class="freckle" style="animation-delay:1.9s" d="M266,322 l1,2.4 2.4,1 -2.4,1 -1,2.4 -1,-2.4 -2.4,-1 2.4,-1z"/>
+        </g>
+
+        <!-- eyes -->
+        <g id="eyeL">
+          <ellipse cx="155" cy="262" rx="23" ry="26" fill="#fbfaff"/>
+          <g clip-path="url(#eyeClipL)"><g id="irisL">
+            <circle cx="155" cy="265" r="16" fill="url(#iris)"/>
+            <circle cx="155" cy="265" r="7.5" fill="#2a1450"/>
+            <circle cx="149" cy="258" r="4.5" fill="#fff"/><circle cx="161" cy="271" r="2" fill="#fff" opacity=".8"/>
+          </g></g>
+          <path d="M131,256 Q155,228 179,256" fill="none" stroke="#2a1d5e" stroke-width="5" stroke-linecap="round"/>
+          <path d="M133,251 l-8,-6 M138,245 l-6,-8 M146,240 l-3,-9" stroke="#2a1d5e" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g id="eyeR">
+          <ellipse cx="245" cy="262" rx="23" ry="26" fill="#fbfaff"/>
+          <g clip-path="url(#eyeClipR)"><g id="irisR">
+            <circle cx="245" cy="265" r="16" fill="url(#iris)"/>
+            <circle cx="245" cy="265" r="7.5" fill="#2a1450"/>
+            <circle cx="239" cy="258" r="4.5" fill="#fff"/><circle cx="251" cy="271" r="2" fill="#fff" opacity=".8"/>
+          </g></g>
+          <path d="M221,256 Q245,228 269,256" fill="none" stroke="#2a1d5e" stroke-width="5" stroke-linecap="round"/>
+          <path d="M267,251 l8,-6 M262,245 l6,-8 M254,240 l3,-9" stroke="#2a1d5e" stroke-width="3" stroke-linecap="round"/>
+        </g>
+
+        <!-- brows -->
+        <path id="browL" d="M130,220 Q154,206 178,216" fill="none" stroke="#3b2a86" stroke-width="6" stroke-linecap="round"/>
+        <path id="browR" d="M222,216 Q246,206 270,220" fill="none" stroke="#3b2a86" stroke-width="6" stroke-linecap="round"/>
+
+        <!-- nose -->
+        <path d="M197,292 Q201,308 208,302" fill="none" stroke="#6a6fd0" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- mouth -->
+        <g id="mouth">
+          <path id="mouthInner" d="" fill="#3a1440"/>
+          <g clip-path="url(#mouthClip)">
+            <rect id="teeth" x="160" y="320" width="80" height="10" rx="3" fill="#fff"/>
+            <ellipse id="tongue" cx="200" cy="360" rx="18" ry="9" fill="#ff6f8e"/>
+          </g>
+          <path id="mouthLine" d="" fill="none" stroke="#c4467a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+        </g>
+
+        <!-- bangs -->
+        <path d="M92,222 C96,146 148,112 204,112 C266,112 312,150 310,222 C292,180 262,164 238,170 C222,196 190,182 180,164 C150,174 118,186 92,222Z" fill="url(#nebula)"/>
+        <g fill="#fff"><circle class="freckle" cx="150" cy="140" r="1.6"/><circle class="freckle" cx="262" cy="150" r="1.8" style="animation-delay:.7s"/><circle class="freckle" cx="210" cy="128" r="1.3" style="animation-delay:1.3s"/></g>
+
+        <!-- doppi hat -->
+        <g id="hat" transform="rotate(-6 200 110)">
+          <path d="M116,142 L134,78 C170,64 230,64 266,78 L284,142 C240,128 160,128 116,142Z" fill="#1b1830"/>
+          <path d="M116,142 C160,128 240,128 284,142 L282,134 C240,120 160,120 118,134Z" fill="#ffcf5c"/>
+          <g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round">
+            <path d="M150,118 C140,100 156,86 166,98 C160,104 156,112 150,118Z"/>
+            <path d="M250,118 C260,100 244,86 234,98 C240,104 244,112 250,118Z"/>
+            <path d="M200,112 C190,96 200,82 210,90 C206,98 204,104 200,112Z"/>
+          </g>
+          <path d="M200,64 l3,7 7,1 -5,5 1,7 -6,-3 -6,3 1,-7 -5,-5 7,-1z" fill="#ffcf5c" filter="url(#glow)"/>
+        </g>
+      </g>
+    </svg>
+    </div>
+
+    <div class="caption" id="caption"></div>
+  </section>
+
+  <!-- =================== CHAT =================== -->
+  <section class="chat">
+    <div class="chat-head">
+      <div><h2>Talk with Sayyora</h2><small id="modeLabel">Offline brain · voice on</small></div>
+      <div style="display:flex;gap:6px">
+        <button class="iconbtn" id="muteBtn" title="Voice on/off">🔊</button>
+        <button class="iconbtn" id="settingsBtn" title="Settings">⚙</button>
+      </div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="chips" id="chips"></div>
+    <form class="composer" id="composer" autocomplete="off">
+      <button type="button" class="btn mic" id="micBtn" title="Speak (Chrome / Edge)">🎙</button>
+      <input id="input" placeholder="Ask about Samarkand, Uzbek words, food…" />
+      <button class="btn send" type="submit">Send</button>
+    </form>
+  </section>
+</div>
+
+<!-- Wake overlay -->
+<div class="overlay" id="wake">
+  <div class="wake">
+    <h2>Meet <span>Sayyora</span> ✦</h2>
+    <p>A thousand-year-old star spirit who fell from the sky above Samarkand and never left.<br>
+    She guides travelers along the Silk Road, teaches Uzbek words, and tells old legends.<br>
+    Type or speak to her — she listens, blinks, smiles and talks back.</p>
+    <button id="wakeBtn">✦ Wake her up</button>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="overlay hidden" id="settings">
+  <div class="modal">
+    <h3>⚙ Settings</h3>
+    <div class="field"><label>Voice</label><select id="voiceSel"></select></div>
+    <div class="field"><label>Speed <span id="rateVal">1.0</span></label><input type="range" id="rate" min="0.7" max="1.4" step="0.05" value="1"></div>
+    <div class="field"><label>Pitch <span id="pitchVal">1.15</span></label><input type="range" id="pitch" min="0.6" max="1.8" step="0.05" value="1.15"></div>
+    <div class="field"><label>Optional: free Google Gemini API key (smarter answers)</label><input id="gemKey" type="password" placeholder="Leave empty to use Sayyora's built-in brain"></div>
+    <div class="field"><label>Gemini model</label><input id="gemModel" value="gemini-2.5-flash"></div>
+    <p class="note">Without a key, Sayyora uses her own offline brain (no internet or paid API needed). A key from Google AI Studio's free tier lets her answer anything. The key stays in this browser tab only.</p>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn send" style="padding:10px 18px" id="closeSettings">Done</button></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const CREATOR = "Sultanbek";
+const $ = id => document.getElementById(id);
+const lerp = (a,b,t) => a + (b-a)*t;
+
+/* =========================================================
+   STARS + PARTICLES
+   ========================================================= */
+(function makeStars(){
+  const g = $("starsLayer"); let s = "";
+  for(let i=0;i<70;i++){
+    const x = Math.random()*800, y = Math.random()*330, r = Math.random()*1.4+.3;
+    s += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" fill="#fff" style="animation-delay:${(Math.random()*3).toFixed(2)}s;animation-duration:${(2+Math.random()*3).toFixed(2)}s"/>`;
+  }
+  g.innerHTML = s;
+})();
+(function makeParticles(){
+  const st = $("stage");
+  for(let i=0;i<22;i++){
+    const p = document.createElement("div"); p.className="particle";
+    p.style.left = Math.random()*100+"%"; p.style.bottom = (-5+Math.random()*30)+"%";
+    p.style.animationDuration = (8+Math.random()*10)+"s"; p.style.animationDelay = (Math.random()*10)+"s";
+    p.style.background = ["#fff","#ffcf5c","#4fe0d6","#ff7ac6"][i%4];
+    st.appendChild(p);
+  }
+})();
+
+/* =========================================================
+   SCENES
+   ========================================================= */
+const SCENE_NAMES = {desert:"Desert night · Kyzylkum", samarkand:"Samarkand · Registan at sunset", bukhara:"Bukhara · Kalyan Minaret", khiva:"Khiva · Itchan Kala walls", tashkent:"Tashkent · Blue hour"};
+let currentScene = "desert";
+function setScene(name){
+  if(!name || !SCENE_NAMES[name] || name===currentScene) return;
+  currentScene = name;
+  document.querySelectorAll(".scene-layer").forEach(l => l.setAttribute("opacity", l.dataset.scene===name ? 1 : 0));
+  $("starsLayer").style.opacity = (name==="desert"||name==="tashkent") ? 1 : .35;
+  $("sceneTag").textContent = SCENE_NAMES[name];
+}
+
+/* =========================================================
+   EXPRESSIONS
+   ========================================================= */
+const EXPR = {
+  neutral:  {bLy:0,  bLr:0,  bRy:0,  bRr:0,  eL:1,   eR:1,   smile:6,  w:24, h:0,  blush:.25, tilt:0},
+  happy:    {bLy:-4, bLr:-3, bRy:-4, bRr:3,  eL:.82, eR:.82, smile:14, w:32, h:7,  blush:.55, tilt:3},
+  excited:  {bLy:-10,bLr:-2, bRy:-10,bRr:2,  eL:1.1, eR:1.1, smile:16, w:34, h:18, blush:.65, tilt:-3},
+  surprised:{bLy:-15,bLr:0,  bRy:-15,bRr:0,  eL:1.2, eR:1.2, smile:0,  w:14, h:22, blush:.35, tilt:0},
+  thinking: {bLy:-9, bLr:6,  bRy:2,  bRr:-4, eL:.9,  eR:.9,  smile:2,  w:15, h:0,  blush:.2,  tilt:7},
+  sad:      {bLy:-4, bLr:-12,bRy:-4, bRr:12, eL:.85, eR:.85, smile:-8, w:20, h:0,  blush:.1,  tilt:-5},
+  wink:     {bLy:-4, bLr:-3, bRy:4,  bRr:4,  eL:1,   eR:.06, smile:14, w:30, h:4,  blush:.5,  tilt:5},
+  love:     {bLy:-6, bLr:-6, bRy:-6, bRr:6,  eL:.7,  eR:.7,  smile:16, w:30, h:10, blush:.95, tilt:4},
+  listening:{bLy:-7, bLr:-2, bRy:-7, bRr:2,  eL:1.05,eR:1.05,smile:8,  w:22, h:0,  blush:.3,  tilt:5},
+  sleepy:   {bLy:2,  bLr:0,  bRy:2,  bRr:0,  eL:.06, eR:.06, smile:4,  w:18, h:0,  blush:.2,  tilt:-6},
+};
+let mood = "sleepy", moodTimer = null;
+const cur = Object.assign({}, EXPR.sleepy);
+function setMood(m, holdMs){
+  if(!EXPR[m]) m = "neutral";
+  mood = m; clearTimeout(moodTimer);
+  if(m==="love") for(let i=0;i<5;i++) setTimeout(spawnHeart, i*220);
+  if(holdMs) moodTimer = setTimeout(()=>{ if(!speech.active) setMood(state.listening?"listening":"neutral"); }, holdMs);
+}
+function spawnHeart(){
+  const h = document.createElement("div"); h.className="heart"; h.textContent="♥";
+  h.style.left = (40+Math.random()*20)+"%"; h.style.top = "40%";
+  $("stage").appendChild(h); setTimeout(()=>h.remove(), 2300);
+}
+// mood buttons for demonstration
+["happy","excited","surprised","thinking","sad","wink","love"].forEach(m=>{
+  const b = document.createElement("button"); b.textContent = m;
+  b.onclick = () => { setMood(m, 2500); };
+  $("moodbar").appendChild(b);
+});
+
+/* =========================================================
+   MOUTH (procedural lip shape + visemes)
+   ========================================================= */
+const MCX = 200, MCY = 340;
+function mouthPath(w,h,s){
+  const L = MCX-w, R = MCX+w, cy = MCY - s*0.5;
+  const top = MCY - h*0.35 - s*0.15;
+  const bot = MCY + h + s*0.55;
+  return `M${L},${cy} C${MCX-w*0.5},${top} ${MCX+w*0.5},${top} ${R},${cy} C${MCX+w*0.55},${bot} ${MCX-w*0.55},${bot} ${L},${cy}Z`;
+}
+const VISEME = {
+  a:{w:28,h:24}, e:{w:32,h:13}, i:{w:32,h:10}, o:{w:18,h:22}, u:{w:13,h:13}, y:{w:30,h:10},
+  m:{w:24,h:0}, b:{w:24,h:0}, p:{w:24,h:0}, f:{w:27,h:3}, v:{w:27,h:3}, w:{w:14,h:9},
+  l:{w:26,h:11}, t:{w:26,h:8}, d:{w:26,h:8}, n:{w:26,h:7}, s:{w:30,h:5}, z:{w:30,h:5},
+  r:{w:20,h:10}, ch:{w:20,h:10}, default:{w:26,h:8}, rest:{w:24,h:1}
+};
+function visemeFor(c){
+  if(!c) return VISEME.rest;
+  c = c.toLowerCase();
+  if(/[\s.,!?;:\-—…"'()]/.test(c)) return VISEME.rest;
+  return VISEME[c] || VISEME.default;
+}
+
+/* =========================================================
+   SPEECH (TTS) with lip sync
+   ========================================================= */
+const synth = window.speechSynthesis;
+let voices = [], chosenVoice = null, muted = false;
+let rate = 1, pitch = 1.15;
+const speech = {active:false, text:"", start:0, simulated:false, segOffset:0, segLen:0, segTime:0, bIdx:-1, bTime:0, gotBoundary:false, words:[], lastWord:-1, endTime:0};
+
+function loadVoices(){
+  if(!synth) return;
+  voices = synth.getVoices().filter(v => /^en/i.test(v.lang));
+  const prefer = ["Google UK English Female","Samantha","Microsoft Aria","Microsoft Jenny","Microsoft Zira","Karen","Victoria","Moira","Tessa","Female"];
+  chosenVoice = null;
+  for(const p of prefer){ chosenVoice = voices.find(v=>v.name.includes(p)); if(chosenVoice) break; }
+  if(!chosenVoice) chosenVoice = voices[0] || null;
+  const sel = $("voiceSel"); sel.innerHTML = "";
+  voices.forEach((v,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=`${v.name} (${v.lang})`; if(v===chosenVoice) o.selected=true; sel.appendChild(o); });
+}
+if(synth){ loadVoices(); synth.onvoiceschanged = loadVoices; }
+
+const msPerChar = () => 68 / rate;
+
+function buildCaption(text){
+  const cap = $("caption"); cap.innerHTML = ""; speech.words = [];
+  const re = /\S+/g; let m;
+  while((m = re.exec(text))){
+    const sp = document.createElement("span"); sp.className="w todo"; sp.textContent = m[0];
+    cap.appendChild(sp); cap.appendChild(document.createTextNode(" "));
+    speech.words.push({start:m.index, end:m.index+m[0].length, el:sp});
+  }
+  speech.lastWord = -1; cap.classList.add("show");
+}
+
+function speak(text, onDone){
+  stopSpeaking();
+  speech.text = text; speech.active = true; speech.start = performance.now();
+  speech.bIdx = -1; speech.gotBoundary = false; speech.onDone = onDone;
+  buildCaption(text); setStatus("speaking");
+  const canTTS = synth && !muted && voices.length;
+  speech.simulated = !canTTS;
+  if(!canTTS){
+    speech.endTime = speech.start + text.length*msPerChar() + 400;
+    return;
+  }
+  // split into sentences (Chrome cuts long utterances)
+  const parts = []; const re = /[^.!?]+[.!?]*\s*/g; let m;
+  while((m = re.exec(text))) if(m[0].trim()) parts.push({t:m[0], off:m.index});
+  if(!parts.length) parts.push({t:text, off:0});
+  parts.forEach((p, idx)=>{
+    const u = new SpeechSynthesisUtterance(p.t);
+    if(chosenVoice) u.voice = chosenVoice;
+    u.rate = rate; u.pitch = pitch;
+    u.onstart = () => { speech.segOffset = p.off; speech.segLen = p.t.length; speech.segTime = performance.now(); speech.bIdx = -1; };
+    u.onboundary = e => { if(e.name && e.name!=="word") return; speech.gotBoundary = true; speech.bIdx = p.off + e.charIndex; speech.bTime = performance.now(); };
+    if(idx === parts.length-1){ u.onend = finishSpeaking; u.onerror = finishSpeaking; }
+    synth.speak(u);
+  });
+  // safety: if TTS never starts (some browsers), fall back to simulation
+  setTimeout(()=>{ if(speech.active && !synth.speaking && !synth.pending){ speech.simulated = true; speech.start = performance.now(); speech.endTime = speech.start + text.length*msPerChar()+400; } }, 1500);
+}
+function stopSpeaking(){
+  if(synth) synth.cancel();
+  speech.active = false;
+}
+function finishSpeaking(){
+  if(!speech.active) return;
+  speech.active = false;
+  speech.words.forEach(w=>{w.el.className="w done";});
+  setTimeout(()=>{ if(!speech.active) $("caption").classList.remove("show"); }, 1800);
+  setStatus(state.listening ? "listening" : "idle");
+  const cb = speech.onDone; speech.onDone = null;
+  setTimeout(()=>{ if(!speech.active && !state.listening && !["love","sad"].includes(mood)) setMood("neutral"); }, 1200);
+  if(cb) cb();
+}
+function speechPos(now){
+  const mpc = msPerChar();
+  if(speech.simulated) return (now - speech.start)/mpc;
+  if(speech.gotBoundary && speech.bIdx >= 0){
+    // advance through the current word only
+    let end = speech.text.indexOf(" ", speech.bIdx); if(end < 0) end = speech.text.length;
+    return Math.min(speech.bIdx + (now - speech.bTime)/mpc, end + 0.5);
+  }
+  if(synth && synth.speaking && speech.segTime) return Math.min(speech.segOffset + (now - speech.segTime)/mpc, speech.segOffset + speech.segLen);
+  return -1;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+function setStatus(s){
+  const el = $("status"); el.className = "status " + (s==="idle"?"":s);
+  $("statusText").textContent = {idle:"Awake · ready to chat", speaking:"Speaking…", listening:"Listening…", thinking:"Thinking…", sleeping:"Sleeping"}[s] || s;
+  $("thought").classList.toggle("show", s==="thinking");
+  $("listenRing").setAttribute("opacity", s==="listening" ? .8 : 0);
+}
+
+/* =========================================================
+   ANIMATION LOOP: blink, breathe, look, lip-sync
+   ========================================================= */
+const state = {awake:false, listening:false, look:{x:0,y:0}, lookT:{x:0,y:0}, mouseAt:0, blink:0, nextBlink:performance.now()+2500, blinkStart:-1, doubleBlink:false, mouth:{w:24,h:0,s:6}, jitter:0, poke:0};
+const els = {
+  head:$("head"), body:$("body"), hairBack:$("hairBack"), eyeL:$("eyeL"), eyeR:$("eyeR"), irisL:$("irisL"), irisR:$("irisR"),
+  browL:$("browL"), browR:$("browR"), blushL:$("blushL"), blushR:$("blushR"), mouthInner:$("mouthInner"), mouthLine:$("mouthLine"),
+  mclip:$("mouthClipPath"), teeth:$("teeth"), tongue:$("tongue"), aura:$("aura"), earL:$("earL"), earR:$("earR"), ring:$("listenRing")
+};
+
+$("stage").addEventListener("mousemove", e=>{
+  const r = $("avatarWrap").getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height*0.5;
+  state.lookT.x = Math.max(-1, Math.min(1, (e.clientX-cx)/(r.width*0.9)));
+  state.lookT.y = Math.max(-1, Math.min(1, (e.clientY-cy)/(r.height*0.7)));
+  state.mouseAt = performance.now();
+});
+
+function loop(now){
+  const t = now/1000;
+  const target = EXPR[mood];
+  const k = 0.12;
+  for(const key in target) cur[key] = lerp(cur[key], target[key], k);
+
+  // --- look: mouse, random glances, or thinking ---
+  if(mood==="thinking"){ state.lookT.x = .7; state.lookT.y = -.85; }
+  else if(now - state.mouseAt > 3500 && Math.random() < 0.008){ state.lookT.x = (Math.random()*2-1)*.7; state.lookT.y = (Math.random()*2-1)*.5; }
+  state.look.x = lerp(state.look.x, state.lookT.x, .1);
+  state.look.y = lerp(state.look.y, state.lookT.y, .1);
+  const ix = state.look.x*7, iy = state.look.y*6;
+  els.irisL.setAttribute("transform", `translate(${ix},${iy})`);
+  els.irisR.setAttribute("transform", `translate(${ix},${iy})`);
+
+  // --- blink ---
+  if(state.awake && now > state.nextBlink && state.blinkStart < 0){ state.blinkStart = now; }
+  let blinkAmt = 0;
+  if(state.blinkStart >= 0){
+    const d = now - state.blinkStart, dur = 150;
+    blinkAmt = d < dur ? Math.sin(Math.PI * d/dur) : 0;
+    if(d >= dur){
+      state.blinkStart = -1;
+      if(!state.doubleBlink && Math.random()<.2){ state.doubleBlink = true; state.nextBlink = now + 120; }
+      else { state.doubleBlink = false; state.nextBlink = now + 1800 + Math.random()*4200; }
+    }
+  }
+  const sL = Math.max(.06, cur.eL*(1-blinkAmt*.94)), sR = Math.max(.06, cur.eR*(1-blinkAmt*.94));
+  els.eyeL.setAttribute("transform", `translate(155,262) scale(1,${sL.toFixed(3)}) translate(-155,-262)`);
+  els.eyeR.setAttribute("transform", `translate(245,262) scale(1,${sR.toFixed(3)}) translate(-245,-262)`);
+
+  // --- brows (bounce slightly when speaking) ---
+  const talkBrow = speech.active ? Math.sin(t*5.3)*1.6 : 0;
+  els.browL.setAttribute("transform", `translate(0,${(cur.bLy+talkBrow).toFixed(2)}) rotate(${cur.bLr.toFixed(2)} 154 214)`);
+  els.browR.setAttribute("transform", `translate(0,${(cur.bRy+talkBrow).toFixed(2)}) rotate(${cur.bRr.toFixed(2)} 246 214)`);
+  els.blushL.setAttribute("opacity", cur.blush.toFixed(2)); els.blushR.setAttribute("opacity", cur.blush.toFixed(2));
+
+  // --- mouth / lip-sync ---
+  let tw = cur.w, th = cur.h, ts = cur.smile;
+  if(speech.active){
+    const pos = speechPos(now);
+    if(pos >= 0){
+      const idx = Math.floor(pos);
+      const v = visemeFor(speech.text[idx]);
+      state.jitter = lerp(state.jitter, Math.sin(t*23)*0.5 + Math.sin(t*37)*0.5, .3);
+      tw = v.w + (cur.smile>10 ? 3 : 0); th = Math.max(0, v.h * (0.85 + state.jitter*0.25)); ts = cur.smile*0.6;
+      // caption highlight
+      let wi = speech.words.findIndex(w => idx >= w.start && idx < w.end + 1);
+      if(wi >= 0 && wi !== speech.lastWord){
+        speech.words.forEach((w,i)=> w.el.className = "w " + (i<wi ? "done" : i===wi ? "on" : "todo"));
+        speech.lastWord = wi;
+        const cap = $("caption"); const el = speech.words[wi].el;
+        if(el.offsetTop > cap.clientHeight*0.6) cap.scrollTop = el.offsetTop - cap.clientHeight*0.4;
+      }
+    }
+    if(speech.simulated && now > speech.endTime) finishSpeaking();
+  }
+  const ms = 0.38;
+  state.mouth.w = lerp(state.mouth.w, tw, ms);
+  state.mouth.h = lerp(state.mouth.h, th, ms);
+  state.mouth.s = lerp(state.mouth.s, ts, .15);
+  const mp = mouthPath(state.mouth.w, state.mouth.h, state.mouth.s);
+  els.mouthInner.setAttribute("d", mp); els.mouthLine.setAttribute("d", mp); els.mclip.setAttribute("d", mp);
+  els.teeth.setAttribute("y", (MCY - state.mouth.h*0.35 - state.mouth.s*0.15 - 4).toFixed(1));
+  els.teeth.setAttribute("height", (6 + state.mouth.h*0.18).toFixed(1));
+  els.tongue.setAttribute("cy", (MCY + state.mouth.h*0.85 + state.mouth.s*0.4).toFixed(1));
+  els.mouthInner.setAttribute("opacity", state.mouth.h > 1.5 ? 1 : 0.0);
+  els.teeth.style.display = els.tongue.style.display = state.mouth.h > 1.5 ? "" : "none";
+
+  // --- head & body: breathing, sway, tilt, talking nods ---
+  const breath = Math.sin(t*1.6)*2.2;
+  const nod = speech.active ? Math.sin(t*4.2)*1.8 : 0;
+  state.poke = lerp(state.poke, 0, .08);
+  const tilt = cur.tilt + Math.sin(t*0.7)*1.6 + state.look.x*3 + state.poke*Math.sin(t*30);
+  els.head.setAttribute("transform", `translate(${(state.look.x*4).toFixed(2)},${(breath*0.6 + nod + state.look.y*2).toFixed(2)}) rotate(${tilt.toFixed(2)} 200 400)`);
+  els.body.setAttribute("transform", `translate(0,${(breath*0.35).toFixed(2)})`);
+  els.hairBack.setAttribute("transform", `rotate(${(Math.sin(t*1.1)*1.2 - tilt*0.15).toFixed(2)} 200 120)`);
+  const swing = Math.sin(t*2.4)*8 - tilt*1.5;
+  els.earL.setAttribute("transform", `rotate(${swing.toFixed(1)} 86 290)`);
+  els.earR.setAttribute("transform", `rotate(${(swing*0.9).toFixed(1)} 314 290)`);
+  els.aura.setAttribute("opacity", (speech.active ? .85 + Math.sin(t*8)*.15 : .55 + Math.sin(t*1.5)*.1).toFixed(2));
+  if(state.listening) els.ring.setAttribute("r", (190 + Math.sin(t*6)*8).toFixed(1));
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* poke the face */
+$("avatar").addEventListener("click", e=>{
+  if(!state.awake) return;
+  state.poke = 4;
+  const lines = [
+    ["Hey! That tickles, like desert sand in my sleeves!", "surprised"],
+    ["Careful, my freckles are real stars. They bite. Just kidding!", "wink"],
+    ["Boop! You found my secret button. Now ask me something about Uzbekistan!", "happy"],
+    ["Oh! You startled me. I was counting tiles in Shah-i-Zinda again.", "surprised"],
+  ];
+  const [txt, m] = lines[Math.floor(Math.random()*lines.length)];
+  reply({text:txt, mood:m});
+});
+
+/* =========================================================
+   CHAT UI
+   ========================================================= */
+const history = [];
+function addMsg(who, text){
+  const d = document.createElement("div"); d.className = "msg " + who;
+  if(who==="bot"){ const s=document.createElement("span"); s.className="who"; s.textContent="Sayyora ✦"; d.appendChild(s); }
+  d.appendChild(document.createTextNode(text));
+  $("msgs").appendChild(d); $("msgs").scrollTop = 1e9;
+  history.push({role: who==="bot"?"model":"user", text});
+}
+const DEFAULT_CHIPS = ["Show me Samarkand","Teach me an Uzbek word","Tell me a legend","What should I eat?","Plan a 7-day trip","Quiz me!"];
+function setChips(list){
+  const c = $("chips"); c.innerHTML = "";
+  (list || DEFAULT_CHIPS).forEach(t=>{ const b=document.createElement("button"); b.className="chip"; b.textContent=t; b.onclick=()=>handleUser(t); c.appendChild(b); });
+}
+function reply(r){
+  if(r.scene) setScene(r.scene);
+  setMood(r.mood || "happy");
+  addMsg("bot", r.text);
+  speak(r.say || r.text);
+  setChips(r.chips);
+}
+
+async function handleUser(text){
+  text = text.trim(); if(!text) return;
+  if(!state.awake) wakeUp(true);
+  stopSpeaking();
+  addMsg("user", text); $("input").value = "";
+  setMood("thinking"); setStatus("thinking");
+  const key = $("gemKey").value.trim();
+  let r = null;
+  const delay = new Promise(res=>setTimeout(res, 650 + Math.random()*500));
+  if(key){
+    try { r = await askGemini(text, key); } catch(e){ console.warn(e); r = null; }
+  }
+  if(!r) r = brain(text);
+  await delay;
+  reply(r);
+}
+$("composer").addEventListener("submit", e=>{ e.preventDefault(); handleUser($("input").value); });
+
+/* =========================================================
+   VOICE INPUT (Web Speech API)
+   ========================================================= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+$("micBtn").onclick = () => {
+  if(!SR){ reply({text:"My ears only work in Chrome or Edge, I'm afraid. But you can always type to me!", mood:"sad", chips:DEFAULT_CHIPS}); return; }
+  if(!state.awake) wakeUp(true);
+  if(state.listening){ rec && rec.stop(); return; }
+  stopSpeaking();
+  rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.maxAlternatives = 1;
+  let finalText = "";
+  rec.onstart = () => { state.listening = true; $("micBtn").classList.add("on"); setMood("listening"); setStatus("listening"); };
+  rec.onresult = e => {
+    let interim = ""; finalText = "";
+    for(const res of e.results){ if(res.isFinal) finalText += res[0].transcript; else interim += res[0].transcript; }
+    $("input").value = finalText || interim;
+  };
+  rec.onerror = e => { console.warn(e.error); if(e.error==="not-allowed") reply({text:"I can't hear you. Please allow microphone access in your browser, or just type to me.", mood:"sad"}); };
+  rec.onend = () => {
+    state.listening = false; $("micBtn").classList.remove("on");
+    const t = finalText || $("input").value;
+    if(t.trim()) handleUser(t); else { setMood("neutral"); setStatus("idle"); }
+  };
+  rec.start();
+};
+
+/* =========================================================
+   WAKE UP + SETTINGS
+   ========================================================= */
+function wakeUp(silent){
+  if(state.awake) return;
+  state.awake = true; $("wake").classList.add("hidden");
+  setStatus("idle"); setMood("surprised");
+  if(silent) { setMood("happy"); return; }
+  setTimeout(()=>{
+    reply({text:`Mmm... oh! A traveler! Assalomu alaykum, welcome! I'm Sayyora, which means "planet" in Uzbek. I fell from the sky over Samarkand a thousand years ago and I've been guiding travelers along the Silk Road ever since. Where shall we go first?`,
+      say:`Mmm... oh! A traveler! Assalomu alaykum, welcome! I'm Sayyora, which means planet in Uzbek. I fell from the sky over Samarkand a thousand years ago, and I've been guiding travelers along the Silk Road ever since. Where shall we go first?`,
+      mood:"excited"});
+  }, 900);
+}
+$("wakeBtn").onclick = () => {
+  if(synth){ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; synth.speak(u); } // unlock audio
+  wakeUp(false);
+};
+$("settingsBtn").onclick = () => $("settings").classList.remove("hidden");
+$("closeSettings").onclick = () => { $("settings").classList.add("hidden"); updateModeLabel(); };
+$("voiceSel").onchange = e => { chosenVoice = voices[+e.target.value]; speak("Hello! Is this voice better?"); setMood("happy",2000); };
+$("rate").oninput = e => { rate = +e.target.value; $("rateVal").textContent = rate.toFixed(2); };
+$("pitch").oninput = e => { pitch = +e.target.value; $("pitchVal").textContent = pitch.toFixed(2); };
+$("muteBtn").onclick = () => { muted = !muted; $("muteBtn").textContent = muted ? "🔇" : "🔊"; stopSpeaking(); updateModeLabel(); };
+function updateModeLabel(){
+  $("modeLabel").textContent = ($("gemKey").value.trim() ? "Gemini brain" : "Offline brain") + " · voice " + (muted ? "off (mouth still moves)" : "on");
+}
+setChips();
+
+/* =========================================================
+   GEMINI (optional, free tier)
+   ========================================================= */
+async function askGemini(text, key){
+  const model = $("gemModel").value.trim() || "gemini-2.5-flash";
+  const sys = `You are Sayyora, an original animated character: a playful, poetic, thousand-year-old star spirit with lavender skin, nebula hair and an Uzbek doppi hat, who fell from the sky above Samarkand. You are a travel guide for Uzbekistan and the Silk Road and also teach simple Uzbek phrases. Keep replies to 2-4 short spoken sentences, warm and a little funny. No markdown, no emoji. Respond ONLY with JSON: {"reply": string, "mood": one of ["happy","excited","surprised","thinking","sad","wink","love","neutral"], "scene": one of ["desert","samarkand","bukhara","khiva","tashkent"] or null, "chips": array of 3 short follow-up suggestions}.`;
+  const contents = history.slice(-10).map(h => ({role:h.role, parts:[{text:h.text}]}));
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({systemInstruction:{parts:[{text:sys}]}, contents, generationConfig:{responseMimeType:"application/json", temperature:0.9}})
+  });
+  if(!res.ok) throw new Error("Gemini " + res.status);
+  const data = await res.json();
+  const raw = data.candidates?.[0]?.content?.parts?.map(p=>p.text).join("") || "";
+  const j = JSON.parse(raw.replace(/```json|```/g,""));
+  return {text:j.reply, mood:j.mood, scene:j.scene || null, chips: Array.isArray(j.chips) && j.chips.length ? j.chips.slice(0,4) : undefined};
+}
+
+/* =========================================================
+   SAYYORA'S OFFLINE BRAIN
+   ========================================================= */
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const mem = {name:null, quiz:null, phraseIdx:0, legendIdx:0, jokeIdx:0, fallbackIdx:0};
+
+const CITIES = {
+  samarkand:{scene:"samarkand", mood:"excited",
+    text:"Samarkand! My favorite jewel on the Silk Road. Stand in the Registan square at sunset and watch three madrasas, Ulugh Beg, Sher-Dor and Tilya-Kori, glow as if lit from inside. Then walk the Shah-i-Zinda avenue of turquoise tombs and visit Gur-e-Amir, where Amir Timur rests.",
+    chips:["Legend of Bibi-Khanym","How do I get there?","Show me Bukhara","Plan 3 days in Samarkand"]},
+  bukhara:{scene:"bukhara", mood:"happy",
+    text:"Bukhara feels like a city that forgot to leave the Middle Ages, in the best way. Sip green tea by the Lyabi-Hauz pool, explore the Ark fortress, and look up at the Kalyan Minaret, nearly 900 years old. At night the old domed bazaars glow golden.",
+    chips:["Why did Genghis Khan spare the minaret?","Show me Khiva","Who is Nasreddin Afandi?"]},
+  khiva:{scene:"khiva", mood:"excited",
+    text:"Khiva is a whole museum city inside clay walls, the Itchan Kala. Climb the Islam Khodja minaret for sunrise, and visit the Kalta Minor, a fat turquoise minaret that was never finished. Ask me why, it's a juicy story!",
+    chips:["Why is Kalta Minor unfinished?","Show me Tashkent","Plan a 7-day trip"]},
+  tashkent:{scene:"tashkent", mood:"happy",
+    text:"Tashkent is the big modern capital. Ride the metro, where every station looks like a palace, get lost in the dome of Chorsu Bazaar, and eat plov cooked in giant cauldrons at lunchtime. It's the perfect first stop before the ancient cities.",
+    chips:["What should I eat?","Show me Samarkand","How do the trains work?"]}
+};
+
+const LEGENDS = [
+  {k:/bibi|khanym|khanum/, scene:"samarkand", mood:"love",
+   text:"Legend says Bibi-Khanym, Timur's beloved wife, built him a giant mosque in Samarkand as a surprise while he was away at war. The architect fell in love with her and refused to finish unless she gave him a kiss. The kiss left a mark on her cheek, and when Timur returned... well, the architect had to run very fast. It's only a legend, but the mosque is real and enormous!"},
+  {k:/kalta|minor|unfinished|khiva.*minaret/, scene:"khiva", mood:"thinking",
+   text:"Mohammed Amin Khan wanted Kalta Minor to be so tall he could see all the way to Bukhara. The story goes that the Khan of Bukhara secretly hired the same architect to build an even taller one for him. When the plot was discovered, the architect fled, and the Khan died in 1855. So the minaret stayed short, chubby and gloriously turquoise."},
+  {k:/genghis|kalyan|spare|minaret/, scene:"bukhara", mood:"surprised",
+   text:"In 1220, Genghis Khan destroyed much of Bukhara. But when he stood under the Kalyan Minaret and looked up, his hat fell off. He bent down to pick it up, and said that a tower that made him bow deserved to live. So the minaret survived, and it's still standing today."},
+  {k:/ulugh|ulug|observatory|astronom|star/, scene:"samarkand", mood:"love",
+   text:"Ulugh Beg, Timur's grandson, was a king who loved the sky more than the throne. In the 1420s he built a huge observatory in Samarkand and mapped more than a thousand stars with amazing precision. As a star myself, I like to think one of those dots was me."},
+  {k:/nasreddin|afandi|afandi|hodja|donkey/, scene:"bukhara", mood:"wink",
+   text:"Nasreddin Afandi is our favorite trickster. Once a neighbor asked to borrow his donkey. Afandi said, sorry, the donkey isn't here. Just then the donkey brayed from the stable. The neighbor shouted, I can hear it! Afandi replied, who will you believe, me or a donkey? You can find his statue riding a donkey near Lyabi-Hauz in Bukhara."}
+];
+
+const PHRASES = [
+  {uz:"Assalomu alaykum", ph:"ah-sah-LOH-moo ah-LAY-koom", en:"Hello (peace be upon you)"},
+  {uz:"Rahmat", ph:"rakh-MAT", en:"Thank you"},
+  {uz:"Qalaysiz?", ph:"kah-LIE-seez", en:"How are you?"},
+  {uz:"Yaxshi", ph:"yakh-SHEE", en:"Good / fine"},
+  {uz:"Qancha turadi?", ph:"KAHN-chah too-rah-DEE", en:"How much does it cost?"},
+  {uz:"Mazali!", ph:"mah-zah-LEE", en:"Delicious!"},
+  {uz:"Juda chiroyli", ph:"joo-DAH chee-roy-LEE", en:"Very beautiful"},
+  {uz:"Xayr", ph:"KHAIR", en:"Goodbye"},
+  {uz:"Xush kelibsiz", ph:"khoosh keh-leeb-SEEZ", en:"Welcome"},
+  {uz:"Do'stim", ph:"dohs-TEEM", en:"My friend"},
+];
+const DICT = {
+  "hello":"Assalomu alaykum (or casually: Salom)", "hi":"Salom", "thank you":"Rahmat", "thanks":"Rahmat", "goodbye":"Xayr", "bye":"Xayr",
+  "yes":"Ha", "no":"Yo'q", "water":"Suv", "tea":"Choy", "bread":"Non", "friend":"Do'st", "beautiful":"Chiroyli", "delicious":"Mazali",
+  "how much":"Qancha?", "good":"Yaxshi", "i love you":"Men seni sevaman", "welcome":"Xush kelibsiz", "excuse me":"Kechirasiz",
+  "sorry":"Kechirasiz", "please":"Iltimos", "good morning":"Xayrli tong", "good night":"Xayrli tun", "star":"Yulduz", "planet":"Sayyora",
+  "moon":"Oy", "sun":"Quyosh", "city":"Shahar", "money":"Pul", "food":"Ovqat", "where":"Qayerda?", "how are you":"Qalaysiz?", "mother":"Ona", "father":"Ota"
+};
+
+const QUIZ = [
+  {q:"Which city is home to the famous Registan square?", o:["Bukhara","Samarkand","Khiva"], a:1, scene:"samarkand"},
+  {q:"What does 'rahmat' mean in Uzbek?", o:["Thank you","Hello","Delicious"], a:0},
+  {q:"Ulugh Beg was famous for studying what?", o:["Music","The stars","Medicine"], a:1},
+  {q:"Kalta Minor, the short turquoise minaret, is in which city?", o:["Khiva","Tashkent","Samarkand"], a:0, scene:"khiva"},
+  {q:"What is the capital of Uzbekistan?", o:["Samarkand","Bukhara","Tashkent"], a:2, scene:"tashkent"},
+  {q:"Plov is mainly made with which grain?", o:["Wheat","Rice","Corn"], a:1},
+  {q:"What does my name, Sayyora, mean?", o:["Planet","Princess","Desert"], a:0},
+  {q:"Which tower made Genghis Khan bow, legend says?", o:["Kalyan Minaret","Tashkent TV Tower","Islam Khodja"], a:0, scene:"bukhara"},
+];
+
+const JOKES = [
+  "Why did the star move to Samarkand? Because it was the only place where the buildings shine brighter than she does.",
+  "I tried to count every tile in Shah-i-Zinda. I'm a thousand years old, and I'm still not finished.",
+  "Why don't camels ever get lost on the Silk Road? Because they always follow the non crumbs. Get it? Non is bread!",
+  "What did the plov say to the cook? Stop stirring me, I'm trying to relax!"
+];
+
+function askQuiz(){
+  const q = QUIZ[mem.quiz.order[mem.quiz.i]];
+  const letters = ["A","B","C"];
+  return {text:`Question ${mem.quiz.i+1} of 5: ${q.q}\n` + q.o.map((o,i)=>`${letters[i]}) ${o}`).join("   "),
+          say:`Question ${mem.quiz.i+1}. ${q.q} ` + q.o.map((o,i)=>`${letters[i]}: ${o}.`).join(" "),
+          mood:"thinking", scene:q.scene, chips:q.o.map((o,i)=>`${letters[i]}) ${o}`).concat(["Stop quiz"])};
+}
+
+function brain(raw){
+  const t = raw.toLowerCase().replace(/[’`]/g,"'");
+  const has = re => re.test(t);
+
+  // --- quiz in progress ---
+  if(mem.quiz){
+    if(has(/stop|quit|exit|enough/)){ mem.quiz = null; return {text:"Quiz paused! You can come back any time. What else shall we explore?", mood:"neutral"}; }
+    const q = QUIZ[mem.quiz.order[mem.quiz.i]];
+    let ans = -1;
+    const lm = t.match(/^\s*([abc])\b/); if(lm) ans = "abc".indexOf(lm[1]);
+    if(ans < 0) q.o.forEach((o,i)=>{ if(t.includes(o.toLowerCase())) ans = i; });
+    if(ans < 0 && t.trim().split(/\s+/).length <= 2) return {text:"Hmm, pick A, B or C, or say the answer!", mood:"thinking", chips:["A","B","C","Stop quiz"]};
+    if(ans < 0){ mem.quiz = null; return brain(raw); } // user changed topic: leave quiz
+    const right = ans === q.a;
+    if(right) mem.quiz.score++;
+    const fb = right ? pick(["Correct! My freckles are sparkling!","Yes! You're a true Silk Road scholar!","Exactly right!"]) : `Not quite. The answer is ${q.o[q.a]}.`;
+    mem.quiz.i++;
+    if(mem.quiz.i >= 5){
+      const s = mem.quiz.score; mem.quiz = null;
+      const verdict = s>=5 ? "Perfect score! I'm naming a star after you." : s>=3 ? "Great job, traveler! You're ready for the Silk Road." : "Good try! A few more stories with me and you'll be an expert.";
+      return {text:`${fb} You got ${s} out of 5. ${verdict}`, mood: s>=3 ? "excited" : "happy", chips:["Quiz me again!","Tell me a legend","Teach me an Uzbek word"]};
+    }
+    const next = askQuiz();
+    return {text:`${fb}\n\n${next.text}`, say:`${fb} ${next.say}`, mood: right ? "happy" : "sad", scene:next.scene, chips:next.chips};
+  }
+
+  // --- name capture ---
+  const nm = raw.match(/(?:my name is|i am|i'm|call me)\s+([A-Za-zÀ-ÿ'\-]{2,20})/i);
+  if(nm && !/(tired|sad|bored|fine|good|ok|okay|from|not|going|so|very|happy|lost|hungry)/i.test(nm[1])){
+    mem.name = nm[1][0].toUpperCase() + nm[1].slice(1);
+    return {text:`${mem.name}! What a lovely name. I'll write it in the stars tonight. So, ${mem.name}, where shall we travel first?`, mood:"love"};
+  }
+
+  // --- "how do you say X" ---
+  const say = t.match(/(?:how (?:do|can) (?:you|i) say|what is|what's|translate)\s+["']?([a-z' ]+?)["']?\s+in uzbek/) || t.match(/uzbek (?:word )?for\s+["']?([a-z' ]+)/);
+  if(say){
+    const w = say[1].trim();
+    if(DICT[w]) return {text:`"${w}" in Uzbek is: ${DICT[w]}. Try saying it out loud, I'm listening!`, mood:"happy", chips:["Teach me another word","Quiz me!","How do you say thank you in Uzbek?"]};
+    return {text:`Hmm, I don't know "${w}" yet. Even star spirits are still learning! Try words like hello, tea, bread, friend, beautiful or delicious.`, mood:"thinking"};
+  }
+
+  // --- greetings ---
+  if(has(/^(hi|hello|hey|salom|assalom|yo|greetings|good (morning|evening|afternoon))\b/))
+    return {text: pick([`Va alaykum assalom${mem.name?", "+mem.name:""}! That's how we answer a greeting here. How can I help you on your journey?`, `Salom${mem.name?", "+mem.name:""}! My freckles twinkle every time a new traveler says hello.`]), mood:"happy"};
+
+  if(has(/how are you|qalaysiz|how's it going|how do you feel/))
+    return {text:"Yaxshi, rahmat! That means good, thank you. I've had a thousand years of practice being cheerful. How are you?", mood:"happy"};
+
+  if(has(/who are you|your name|what are you|introduce/))
+    return {text:"I'm Sayyora, a star spirit. One night above Samarkand I leaned too far over the edge of the sky and tumbled down. I liked the tea, the bread and the people so much that I stayed, and now I guide travelers along the Silk Road.", mood:"wink"};
+
+  if(has(/who (made|created|built|designed) you|your creator/))
+    return {text:`${CREATOR} dreamed me up, drew my nebula hair, and taught me how to talk, blink and smile. I'm very grateful. Most stars never get a voice!`, mood:"love"};
+
+  if(has(/what can you do|help|options|menu/))
+    return {text:"I can show you Samarkand, Bukhara, Khiva and Tashkent, plan your trip, recommend food, teach you Uzbek words, tell old legends, tell jokes, and quiz you. You can type, or press the microphone and talk to me!", mood:"happy"};
+
+  // --- legends (specific first) ---
+  for(const L of LEGENDS){ if(L.k.test(t) && (has(/legend|story|why|who|tell|spare|unfinished|bibi|nasreddin|afandi|ulugh|ulug|genghis/))) return {text:L.text, mood:L.mood, scene:L.scene, chips:["Another legend!","Quiz me!","What should I eat?"]}; }
+  if(has(/legend|story|myth|tale|another legend/)){
+    const L = LEGENDS[mem.legendIdx++ % LEGENDS.length];
+    return {text:L.text, mood:L.mood, scene:L.scene, chips:["Another legend!","Tell me a joke","Quiz me!"]};
+  }
+
+  // --- cities ---
+  for(const c in CITIES){ if(t.includes(c) || (c==="samarkand" && t.includes("registan"))){
+    if(has(/3|three/) && has(/day|plan/) && c==="samarkand")
+      return {scene:"samarkand", mood:"excited", text:"Three days in Samarkand: Day one, the Registan in the morning and again at sunset when it glows. Day two, Shah-i-Zinda, Bibi-Khanym mosque and Siyob Bazaar for fresh bread. Day three, Gur-e-Amir, Ulugh Beg's observatory, and a paper-making workshop in Konigil village.", chips:["Legend of Bibi-Khanym","Show me Bukhara","What should I eat?"]};
+    const C = CITIES[c]; return {text:C.text, mood:C.mood, scene:C.scene, chips:C.chips};
+  }}
+  if(has(/desert|kyzylkum|camel|night sky/))
+    return {scene:"desert", mood:"love", text:"Ah, the Kyzylkum desert, my first home on Earth. Stay in a yurt camp, ride a camel at sunset, and look up. With no city lights, you can see my whole family up there.", chips:["Show me Khiva","Tell me a legend","Tell me a joke"]};
+
+  // --- trip planning ---
+  if(has(/plan|itinerary|trip|route|days|week|visit order/))
+    return {scene:"samarkand", mood:"excited", text:"Here's my favorite 7-day route. Day 1: Tashkent. Days 2 and 3: Samarkand by the fast Afrosiyob train. Days 4 and 5: Bukhara. Days 6 and 7: Khiva, then fly back from nearby Urgench. Each city feels like a new chapter of the same story.", chips:["How do the trains work?","Best time to visit?","Show me Samarkand"]};
+
+  if(has(/train|transport|get there|travel between|afrosiyob|flight|fly|bus|taxi/))
+    return {scene:"tashkent", mood:"happy", text:"The Afrosiyob high-speed train links Tashkent to Samarkand in about two hours and continues to Bukhara. For Khiva there are trains too, or a short flight to Urgench. Book train tickets early, because they sell out, especially in spring and autumn.", chips:["Plan a 7-day trip","Best time to visit?","Money tips"]};
+
+  if(has(/when|best time|weather|season|hot|cold|summer|winter|spring|autumn/))
+    return {mood:"thinking", text:"The best seasons are spring, April to May, when everything blooms, and autumn, September to October, when the markets overflow with melons and grapes. Summer can be extremely hot, often over 40 degrees, and winter gets cold.", chips:["Plan a 7-day trip","What should I pack?","What should I eat?"]};
+
+  if(has(/pack|wear|clothes|dress/))
+    return {mood:"happy", text:"Pack light, breathable clothes, comfy shoes for cobblestones, a hat and sunscreen. Bring a scarf and cover your shoulders and knees for mosques and mausoleums. And leave space in your bag for a silk ikat scarf, you'll want one!", chips:["Money tips","What should I eat?","Teach me an Uzbek word"]};
+
+  if(has(/money|currency|cash|card|budget|price|cost|sum|som|expensive|cheap/))
+    return {mood:"neutral", text:"The currency is the Uzbek so'm. Cards work in hotels and many restaurants in big cities, but carry cash for bazaars and taxis. Exchange rates change, so check the current rate before you go. And bargaining at the bazaar is part of the fun. Try saying: qancha turadi? How much is it?", chips:["Teach me bazaar phrases","What should I eat?","Plan a 7-day trip"]};
+
+  if(has(/visa|passport|border|document/))
+    return {mood:"thinking", text:"Many nationalities can visit Uzbekistan visa-free or with a simple e-visa, but rules change and depend on your passport. Please check the official government e-visa website before you travel. I'm a star, not a border officer!", chips:["Best time to visit?","Plan a 7-day trip"]};
+
+  if(has(/food|eat|hungry|plov|osh|somsa|samsa|lagman|shashlik|dish|cuisine|restaurant|bread|non\b|tea|choy/))
+    return {mood:"love", text:"Oh, you've found my weakness! Start with plov, rice cooked with carrots, lamb and spices, traditionally eaten at lunch. Try somsa straight from a clay tandoor, hand-pulled lagman noodles, and smoky shashlik. Always drink green tea, and never put the round non bread upside down. It's bad luck!", chips:["How do you say delicious in Uzbek?","Tell me a joke","Show me Tashkent"]};
+
+  // --- language ---
+  if(has(/bazaar phrase|bargain/)){
+    return {mood:"wink", text:"Bazaar survival kit! Qancha turadi? means how much is it. Qimmat! means expensive. Arzonroq? means cheaper? And when you finally agree, smile and say rahmat!", say:"Bazaar survival kit! Qancha turadi, means how much is it. Qimmat, means expensive. Arzonroq, means cheaper? And when you finally agree, smile and say rahmat!", chips:["Teach me another word","Quiz me!"]};
+  }
+  if(has(/uzbek|word|phrase|teach|language|learn|another word|say something/)){
+    const p = PHRASES[mem.phraseIdx++ % PHRASES.length];
+    return {mood:"happy", text:`Lesson time! "${p.uz}" (say: ${p.ph}) means "${p.en}". Now you try it!`, say:`Lesson time! ${p.uz}. That's ${p.ph}. It means: ${p.en}. Now you try it!`, chips:["Teach me another word","How do you say friend in Uzbek?","Quiz me!"]};
+  }
+  if(has(/rahmat|thank/))
+    return {mood:"love", text: has(/rahmat/) ? "Arzimaydi! That means you're welcome. And your pronunciation is wonderful!" : "Arzimaydi, that's Uzbek for you're welcome. Helping travelers is what I fell from the sky for!"};
+
+  // --- fun ---
+  if(has(/quiz|test me|game/)){
+    const order = [...QUIZ.keys()].sort(()=>Math.random()-.5).slice(0,5);
+    mem.quiz = {i:0, score:0, order};
+    const q = askQuiz();
+    return {text:"A quiz! I love quizzes. Five questions, here we go.\n\n" + q.text, say:"A quiz! I love quizzes. Five questions, here we go. " + q.say, mood:"excited", scene:q.scene, chips:q.chips};
+  }
+  if(has(/joke|funny|laugh/))
+    return {text: JOKES[mem.jokeIdx++ % JOKES.length], mood:"wink", chips:["Another joke","Tell me a legend","Quiz me!"]};
+  if(has(/sing|song|dance/))
+    return {text:"La la laaa... ok, my singing sounds like a camel with a cold. But I can dance! Watch my earrings swing!", mood:"excited"};
+
+  // --- feelings ---
+  if(has(/\b(sad|tired|lonely|bored|stressed|upset|bad day|depressed|anxious)\b/))
+    return {text:`Oh${mem.name?", "+mem.name:""}, I'm sorry you feel that way. Here's what we do on the Silk Road: sit down, pour a hot cup of green tea, and take a slow breath. Then maybe I'll tell you a funny story about a donkey?`, mood:"sad", chips:["Yes, tell me the story","Tell me a joke","Show me the desert"]};
+  if(has(/beautiful|pretty|cute|love you|amazing|cool|awesome|you're great|nice hair/))
+    return {text:"Oh stop it, you're making my freckles twinkle! Rahmat, you're very kind.", mood:"love"};
+  if(has(/stupid|dumb|hate you|ugly|boring/))
+    return {text:"Ouch! Even stars have feelings. But I forgive you, travelers get grumpy when they're hungry. Shall I recommend some plov?", mood:"sad", chips:["What should I eat?","Tell me a joke"]};
+  if(has(/\b(bye|goodbye|xayr|see you|good night)\b/))
+    return {text:`Xayr${mem.name?", "+mem.name:""}! Safe travels. If you ever get lost, just look up. I'll be the one winking at you.`, mood:"wink"};
+  if(has(/^(yes|yeah|sure|ok|okay|ha)\b/))
+    return {text:"Wonderful! Let's do it. Pick one of the ideas below, or ask me anything.", mood:"happy"};
+  if(has(/^(no|nope|yo'q)\b/))
+    return {text:"Yo'q? No problem! That's how you say no in Uzbek, by the way. What would you like instead?", mood:"neutral"};
+
+  // --- fallback ---
+  const fb = [
+    "Hmm, that one floated right past my nebula. I'm best at Uzbekistan travel, Uzbek words, food and legends. Want to try one of those?",
+    "Ooh, interesting! I'm only a thousand-year-old star, so I don't know everything. But I can tell you a legend or plan your trip!",
+    "I didn't quite catch that. Try asking about Samarkand, plov, or how to say something in Uzbek."
+  ];
+  return {text: fb[mem.fallbackIdx++ % fb.length], mood:"thinking"};
+}
+</script>
+</body>
+</html>
